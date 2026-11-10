@@ -70,7 +70,7 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_c0L4_aJuEqJWMkcPGGACsw_VNR8C7zx';
     const WORKER_URL = 'https://train.15910259721.workers.dev';
     
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabaseClient.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let ws;
     let currentUser = null;
     let currentRoomId = null;
@@ -88,7 +88,7 @@
         // 使用用户名作为邮箱前缀伪造邮箱
         const email = `${username}@train.game`;
         
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await supabaseClient.auth.signUp({
             email, password,
             options: { data: { username, avatar_url: avatar } }
         });
@@ -99,7 +99,7 @@
     }
 
     async function checkLogin() {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         if (user) {
             currentUser = user;
             const username = user.user_metadata.username;
