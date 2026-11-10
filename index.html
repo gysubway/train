@@ -63,14 +63,15 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
     // --- 配置 ---
     const SUPABASE_URL = 'https://xacjvyjiyvouqpuxwnwf.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_c0L4_aJuEqJWMkcPGGACsw_VNR8C7zx';
     const WORKER_URL = 'https://train.15910259721.workers.dev';
     
-    const supabaseClient = window.supabaseClient.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { createClient } = window.supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let ws;
     let currentUser = null;
     let currentRoomId = null;
