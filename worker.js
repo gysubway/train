@@ -1,16 +1,11 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    // 匹配 /room/xxxx 这样的路径
     const match = url.pathname.match(/^\/room\/(.+)$/);
-    
     if (match) {
       const roomId = match[1];
-      // 找到对应的 Durable Object 实例
       const id = env.ROOMS.idFromName(roomId);
-      const stub = env.ROOMS.get(id);
-      // 把请求转交给它
-      return stub.fetch(request);
+      return env.ROOMS.get(id).fetch(request);
     }
     return new Response("Not Found", { status: 404 });
   }
