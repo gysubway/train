@@ -87,7 +87,7 @@
         const avatar = document.getElementById('reg-avatar').value;
 
         // 使用用户名作为邮箱前缀伪造邮箱
-        const email = `${username}@train.game`;
+        const email = `${username}@train.com`;
         
         const { data, error } = await supabaseClient.auth.signUp({
             email, password,
