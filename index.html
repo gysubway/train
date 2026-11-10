@@ -139,22 +139,28 @@
 
     // --- WebSocket 联机逻辑 ---
     function connectWebSocket(roomId) {
-        // ws:// 或 wss:// 取决于你的 worker 配置
-        ws = new WebSocket(`${WORKER_URL.replace('http', 'ws')}/room/${roomId}?user=${currentUser.user_metadata.username}`);
+        const wsUrl = `${WORKER_URL.replace('http', 'ws')}/room/${roomId}?user=${currentUser.user_metadata.username}`;
+        console.log("1. 准备连接 WebSocket:", wsUrl); // 调试日志
+        
+        ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
-            console.log('Connected to DO');
-            // 发送加入消息
+            console.log('2. ✅ WebSocket 连接成功！'); // 调试日志
             sendWS({ type: 'join', isHost: isHost });
         };
 
         ws.onmessage = (event) => {
+            console.log('3. 📩 收到后端消息:', event.data); // 调试日志
             const msg = JSON.parse(event.data);
             handleMessage(msg);
         };
 
+        ws.onerror = (e) => {
+            console.error('❌ WebSocket 报错了:', e); // 调试日志
+        };
+
         ws.onclose = () => {
-            console.log('Disconnected');
+            console.log('🔌 WebSocket 连接已断开'); // 调试日志
         };
     }
 
