@@ -2,223 +2,42 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>铁路环游联机版 - MVP</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .hidden { display: none !important; }
-        .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
-        .seat { border: 1px dashed #999; padding: 10px; margin: 5px 0; display: flex; align-items: center;}
-        .seat.occupied { border-style: solid; background: #eef; }
-        #chat-box { height: 150px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
-        .emoji-btn { font-size: 20px; cursor: pointer; margin-right: 5px; }
-    </style>
+    <title>Supabase 纯净测试</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <h2>纯净版 Supabase 测试</h2>
+    <button onclick="testRegister()">点我测试注册</button>
+    <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
 
-<!-- 1. 注册/登录区 -->
-<div id="auth-section" class="box">
-    <h2>注册账号</h2>
-    <p><strong>验证题：中朝国列的YW25T的较大六位车号是？</strong></p>
-    <input type="text" id="reg-answer" placeholder="输入答案">
-    <input type="text" id="reg-username" placeholder="设置用户名">
-    <input type="password" id="reg-password" placeholder="设置密码">
-    <input type="text" id="reg-avatar" placeholder="头像URL (选填)">
-    <button onclick="register()">注册并登录</button>
-</div>
-
-<!-- 2. 大厅与房间区 -->
-<div id="lobby-section" class="box hidden">
-    <h2>大厅</h2>
-    <p>欢迎, <span id="display-username"></span></p>
-    <input type="text" id="room-id-input" placeholder="输入房间号">
-    <button onclick="joinRoom()">进入房间</button>
-    <button onclick="createRoom()">创建新房间</button>
-</div>
-
-<!-- 3. 游戏房间区 -->
-<div id="room-section" class="box hidden">
-    <h3>房间号: <span id="current-room-id"></span> (你是房主: <span id="is-host">否</span>)</h3>
-    <div id="seats-container"></div>
-    
-    <div id="host-controls" class="hidden">
-        <label>设置最大人数: </label>
-        <input type="number" id="max-players" value="4" min="2" max="8">
-        <button onclick="updateMaxPlayers()">更新人数</button>
-        <button onclick="startGame()">开始游戏 (人满才可点击)</button>
-    </div>
-
-    <div id="game-result" class="hidden box" style="background:#ffd700;">
-        <h2>游戏结束！胜利者是：<span id="winner-name"></span></h2>
-        <button onclick="leaveRoom()">返回大厅</button>
-    </div>
-
-    <div id="chat-container">
-        <div id="chat-box"></div>
-        <div>
-            <button class="emoji-btn" onclick="sendChat('🚂')">🚂</button>
-            <button class="emoji-btn" onclick="sendChat('😡')">😡</button>
-            <button class="emoji-btn" onclick="sendChat('💰')">💰</button>
-            <button class="emoji-btn" onclick="sendChat('😭')">😭</button>
-        </div>
-    </div>
-</div>
-
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script>
-    // --- 配置 ---
-    const SUPABASE_URL = 'https://xacjvyjiyvouqpuxwnwf.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_c0L4_aJuEqJWMkcPGGACsw_VNR8C7zx';
-    const WORKER_URL = 'https://train.15910259721.workers.dev';
-    
-    const { createClient } = window.supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let ws;
-    let currentUser = null;
-    let currentRoomId = null;
-    let isHost = false;
-
-    // --- Auth 逻辑 ---
-    async function register() {
-        const answer = document.getElementById('reg-answer').value.trim();
-        if (answer !== '677533') return alert('验证码错误！');
-
-        const username = document.getElementById('reg-username').value;
-        const password = document.getElementById('reg-password').value;
-        const avatar = document.getElementById('reg-avatar').value;
-
-        // 使用用户名作为邮箱前缀伪造邮箱
-        const email = `${username}@train.com`;
+    <script>
+        // 替换为你的信息
+        const URL = 'https://xacjvyjiyvouqpuxwnwf.supabase.co';
+        const KEY = 'sb_publishable_c0L4_aJuEqJWMkcPGGACsw_VNR8C7zx'; 
         
-        const { data, error } = await supabaseClient.auth.signUp({
-            email, password,
-            options: { data: { username, avatar_url: avatar } }
-        });
+        // 初始化
+        const supabase = window.supabase.createClient(URL, KEY);
 
-        if (error) return alert(error.message);
-        alert('注册成功！');
-        checkLogin();
-    }
+        async function testRegister() {
+            document.getElementById('result').innerText = '请求发送中...';
+            console.log("发起注册请求...");
 
-    async function checkLogin() {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (user) {
-            currentUser = user;
-            const username = user.user_metadata.username;
-            document.getElementById('display-username').innerText = username;
-            document.getElementById('auth-section').classList.add('hidden');
-            document.getElementById('lobby-section').classList.remove('hidden');
+            // 直接用纯英文和合法后缀，排除一切干扰
+            const { data, error } = await supabase.auth.signUp({
+                email: 'test001@qq.com', 
+                password: 'password123'
+            });
+
+            if (error) {
+                console.error("报错了：", error);
+                document.getElementById('result').innerText = '失败：' + error.message;
+                document.getElementById('result').style.color = 'red';
+            } else {
+                console.log("成功：", data);
+                document.getElementById('result').innerText = '注册成功！请去后台查看！';
+                document.getElementById('result').style.color = 'green';
+            }
         }
-    }
-    checkLogin();
-
-    // --- 大厅与房间逻辑 ---
-    function createRoom() {
-        // 生成4位随机房间号
-        const roomId = Math.floor(1000 + Math.random() * 9000).toString();
-        enterRoom(roomId, true);
-    }
-
-    function joinRoom() {
-        const roomId = document.getElementById('room-id-input').value.trim();
-        if (!roomId) return;
-        enterRoom(roomId, false);
-    }
-
-    function enterRoom(roomId, host) {
-        currentRoomId = roomId;
-        isHost = host;
-        document.getElementById('lobby-section').classList.add('hidden');
-        document.getElementById('room-section').classList.remove('hidden');
-        document.getElementById('current-room-id').innerText = roomId;
-        document.getElementById('is-host').innerText = isHost ? '是' : '否';
-        if (isHost) document.getElementById('host-controls').classList.remove('hidden');
-
-        // 连接 WebSocket (DO)
-        connectWebSocket(roomId);
-    }
-
-    // --- WebSocket 联机逻辑 ---
-    function connectWebSocket(roomId) {
-        const wsUrl = `${WORKER_URL.replace('http', 'ws')}/room/${roomId}?user=${currentUser.user_metadata.username}`;
-        console.log("1. 准备连接 WebSocket:", wsUrl); // 调试日志
-        
-        ws = new WebSocket(wsUrl);
-
-        ws.onopen = () => {
-            console.log('2. ✅ WebSocket 连接成功！'); // 调试日志
-            sendWS({ type: 'join', isHost: isHost });
-        };
-
-        ws.onmessage = (event) => {
-            console.log('3. 📩 收到后端消息:', event.data); // 调试日志
-            const msg = JSON.parse(event.data);
-            handleMessage(msg);
-        };
-
-        ws.onerror = (e) => {
-            console.error('❌ WebSocket 报错了:', e); // 调试日志
-        };
-
-        ws.onclose = () => {
-            console.log('🔌 WebSocket 连接已断开'); // 调试日志
-        };
-    }
-
-    function sendWS(data) {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify(data));
-        }
-    }
-
-    function handleMessage(msg) {
-        switch (msg.type) {
-            case 'room_state':
-                renderSeats(msg.players, msg.maxPlayers);
-                break;
-            case 'chat':
-                appendChat(`${msg.user}: ${msg.text}`);
-                break;
-            case 'game_over':
-                document.getElementById('game-result').classList.remove('hidden');
-                document.getElementById('winner-name').innerText = msg.winner;
-                break;
-        }
-    }
-
-    // --- UI 渲染逻辑 ---
-    function renderSeats(players, maxPlayers) {
-        const container = document.getElementById('seats-container');
-        container.innerHTML = '';
-        for (let i = 0; i < maxPlayers; i++) {
-            const p = players[i];
-            const div = document.createElement('div');
-            div.className = p ? 'seat occupied' : 'seat';
-            div.innerText = p ? `👤 ${p}` : '空座';
-            container.appendChild(div);
-        }
-    }
-
-    // 房主操作
-    function updateMaxPlayers() {
-        const max = parseInt(document.getElementById('max-players').value);
-        sendWS({ type: 'set_max_players', max });
-    }
-
-    function startGame() {
-        // 发送开始指令给 DO，让 DO 随机选人并广播
-        sendWS({ type: 'start_game' });
-    }
-
-    // 聊天
-    function sendChat(text) {
-        sendWS({ type: 'chat', text });
-    }
-
-    function appendChat(text) {
-        const box = document.getElementById('chat-box');
-        box.innerHTML += `<div>${text}</div>`;
-        box.scrollTop = box.scrollHeight;
-    }
-</script>
+    </script>
 </body>
 </html>
